@@ -1,6 +1,7 @@
 # 📱 Painel de Obras - Frontend Simplificado
 
 Frontend básico para acompanhamento de obras, desenvolvido com tecnologias essenciais.
+Projeto esta em andamento para desenvolvimento do back-end
 
 ## 🔧 O que foi feito
 
