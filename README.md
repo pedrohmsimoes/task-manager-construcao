@@ -16,8 +16,8 @@ Projeto esta em andamento para desenvolvimento do back-end
 - **JavaScript Vanilla**: 
   - DOM manipulation
 - **Bibliotecas**:
-  - Chart.js (gráficos simples)
-  - Font Awesome (ícones)
+  - flask
+  
 
 ### Funcionalidades Implementadas
 | Página          | Funcionalidades                          |
