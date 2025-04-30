@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel do Cliente – BR Construtora</title>
+  <link rel="stylesheet" href="../css/style-painel-cliente.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+</head>
+<body>
+  <header class="top-header">
+    <h1><span > BR</span>Construtora</h1>
+    <nav>
+      <a href="../homepage.html">Home</a>
+      <a href="javascript:history.back()">Voltar</a>
+    </nav>
+  </header>
+
+  <main class="painel-cliente">
+    <h2>Painel da Obra: <span id="titulo" class="titulo-obra">Residencial</span></h2>
+
+    <div class="cards">
+      <div class="card">
+        <h4>👷 Responsável</h4>
+        <p id="responsavel_nome">Eng. Claudionor Donizete Garcia </p>
+        <p><span>📞</span> <span id="responsavel_telefone">11 99902-3574</span></p>
+      </div>
+
+      <div class="card">
+        <h4>📅 Cronômetro</h4>
+        <p><strong id="dias_obra">-</strong> dias de obra</p>
+        <small>Início: <span id="data_inicio">--/--/----</span></small><br>
+        <small>Status: <span id="status_obra">---</span></small>
+      </div>
+      
+
+      <div class="card">
+        <h4>🏁 Prazo</h4>
+        <p>Entrega prevista: <strong id="data_entrega">--/--/----</strong></p>
+        <div class="progress-bar">
+          <div class="progress" id="barra-progresso" style="width: 0%;">0%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="graficos">
+      <div class="grafico-box">
+        <h3>📊 Gastos da Obra</h3>
+        <canvas id="graficoGastos"></canvas>
+      </div>
+
+      <div class="grafico-box">
+        <h3>📦 Materiais Comprados</h3>
+        <canvas id="graficoMateriais"></canvas>
+      </div>
+    </div>
+
+    <section>
+      <h3>📷 Andamento da Obra</h3>
+      <div id="galeria"></div>
+    </section>
+  </main>
+
+  <footer>
+    &copy; 2025 BR Construtora – Todos os direitos reservados.
+  </footer>
+
+  <!-- JS integrado -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const idObra = new URLSearchParams(window.location.search).get('id');
+      if (!idObra) {
+        alert('ID da obra não informado.');
+        return;
+      }
+
+      function formatarData(dataISO) {
+        const data = new Date(dataISO);
+        return isNaN(data.getTime()) ? '--/--/----' : data.toLocaleDateString('pt-BR');
+      }
+
+      function calcularDias(dataInicio) {
+        const inicio = new Date(dataInicio);
+        const hoje = new Date();
+        const diff = hoje - inicio;
+        return Math.floor(diff / (1000 * 60 * 60 * 24));
+      }
+
+      function calcularProgresso(dataInicio, dataEntrega) {
+        const inicio = new Date(dataInicio);
+        const entrega = new Date(dataEntrega);
+        const hoje = new Date();
+        const total = entrega - inicio;
+        const passado = hoje - inicio;
+        if (total <= 0) return 0;
+        return Math.min(100, Math.round((passado / total) * 100));
+      }
+
+      fetch(`http://localhost:5000/obras/${idObra}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.erro) {
+            document.body.innerHTML = `<p style="color:red">${data.erro}</p>`;
+            return;
+          }
+
+          document.getElementById('titulo').textContent = data.titulo || 'Sem título';
+          document.getElementById('responsavel_nome').textContent = data.responsavel_nome || 'Eng. Claudionor Donizete Garcia';
+          document.getElementById('responsavel_telefone').textContent = data.responsavel_telefone || '11 99902-3574';
+          document.getElementById('data_inicio').textContent = formatarData(data.data_inicio);
+          document.getElementById('data_entrega').textContent = formatarData(data.prazo_entrega);
+          document.getElementById('status_obra').textContent = data.status || 'Não informado';
+
+          const diasObra = calcularDias(data.data_inicio);
+          document.getElementById('dias_obra').textContent = diasObra;
+
+          const progresso = calcularProgresso(data.data_inicio, data.prazo_entrega);
+          const barra = document.getElementById('barra-progresso');
+          barra.style.width = `${progresso}%`;
+          barra.textContent = `${progresso}%`;
+
+          new Chart(document.getElementById('graficoGastos'), {
+            type: 'doughnut',
+            data: {
+              labels: ['Gasto (%)', 'Restante (%)'],
+              datasets: [{
+                data: [data.percentual_gasto || progresso, 100 - (data.percentual_gasto || progresso)],
+                backgroundColor: ['#ff7a00', '#e0e0e0']
+              }]
+            },
+            options: {
+              plugins: { legend: { position: 'bottom' } },
+              cutout: '65%'
+            }
+          });
+
+          fetch(`http://localhost:5000/obras/${idObra}/materiais`)
+            .then(res => res.json())
+            .then(materiais => {
+              const nomes = materiais.map(m => m.nome);
+              const valores = materiais.map(m => m.quantidade * m.custo);
+              new Chart(document.getElementById('graficoMateriais'), {
+                type: 'bar',
+                data: {
+                  labels: nomes,
+                  datasets: [{
+                    label: 'Gasto por Material (R$)',
+                    data: valores,
+                    backgroundColor: '#ff7a00'
+                  }]
+                },
+                options: {
+                  responsive: true,
+                  scales: {
+                    y: { beginAtZero: true }
+                  }
+                }
+              });
+            });
+
+          fetch(`http://localhost:5000/obras/${idObra}/fotos`)
+            .then(res => res.json())
+            .then(data => {
+              const galeria = document.getElementById('galeria');
+              galeria.innerHTML = '';
+              if (data.fotos && data.fotos.length > 0) {
+                data.fotos.forEach(url => {
+                  const img = document.createElement('img');
+                  img.src = `http://localhost:5000${url}`;
+                  img.style.width = '180px';
+                  img.style.margin = '10px';
+                  img.style.borderRadius = '8px';
+                  galeria.appendChild(img);
+                });
+              } else {
+                galeria.textContent = 'Nenhuma foto disponível.';
+              }
+            });
+        })
+        .catch(err => {
+          console.error(err);
+          alert('Erro ao carregar dados da obra.');
+        });
+    });
+  </script>
+</body>
+</html>

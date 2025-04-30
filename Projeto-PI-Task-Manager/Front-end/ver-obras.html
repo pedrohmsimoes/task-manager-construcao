@@ -1,0 +1,49 @@
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acesso às Obras – BR Construtora</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header>
+    <a href="homepage.html" class="logo-Centro">
+      <h1><i class="fas fa-home"></i> <span>BR</span>Construtora</h1>
+  </a>
+  </header>
+
+  <main class="container-obras">
+    <h1>Como você deseja acessar?</h1>
+
+    <div class="botoes">
+      <button onclick="mostrarCliente()">Sou Cliente</button>
+      <button onclick="window.location.href='login.html?tipo=admin'">Sou Admin</button>
+    </div>
+
+    <div id="areaCliente" style="margin-top: 30px; display: none;">
+      <form id="formCliente">
+        <label for="idobra">Digite o ID da sua Obra:</label><br>
+        <input type="number" id="idobra" placeholder="Digite o ID da sua Obra:" required>
+        <button type="submit">Acessar</button>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    &copy; 2025 BR Construtora. Todos os direitos reservados.
+  </footer>
+
+  <script>
+    function mostrarCliente() {
+      document.getElementById('areaCliente').style.display = 'block';
+    }
+
+    document.getElementById('formCliente').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = document.getElementById('idobra').value;
+      if (id) {
+        window.location.href = `cliente/painel-cliente.html?id=${id}`;
+      }
+    });
+  </script>
+</body>

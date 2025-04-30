@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cadastrar Nova Obra</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../css/style-cadastro.css" />
+</head>
+<body>
+  <header>
+    <div class="top-bar">
+      <h2>BR Construtora – Cadastro de Obra</h2>
+      <div class="top-buttons">
+        <button onclick="history.back()">🔙 Voltar</button>
+        <a href="../homepage.html"><button>⛔ Sair</button></a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1>Cadastrar Nova Obra</h1>
+
+    <form id="formCadastro">
+      <label for="cliente_nome">Cliente:</label>
+      <input type="text" id="cliente_nome" required />
+
+      <label for="titulo">Título da Obra:</label>
+      <input type="text" id="titulo" required />
+
+      <label for="status">Status:</label>
+      <select id="status" required>
+        <option value="Planejada">Planejada</option>
+        <option value="Em andamento">Em andamento</option>
+        <option value="Concluída">Concluída</option>
+      </select>
+
+      <label for="data_inicio">Data de Início:</label>
+      <input type="date" id="data_inicio" required />
+      <label for="prazo_entrega">Prazo de Entrega:</label>
+      <input type="date" id="prazo_entrega" name="prazo_entrega" required>
+
+
+      <label>Orçamento Total (R$):</label>
+      <input type="number" id="orcamento_total" step="0.01" required /><br/>
+
+      <button type="submit">Cadastrar</button>
+    </form>
+
+    <p id="msg"></p>
+
+  </main>
+
+  <footer>
+    &copy; 2025 BR Construtora. Todos os direitos reservados.
+  </footer>
+
+  
+  <script>
+    document.getElementById('formCadastro').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const body = {
+        cliente_nome: document.getElementById('cliente_nome').value,
+        titulo: document.getElementById('titulo').value,
+        status: document.getElementById('status').value,
+        data_inicio: document.getElementById('data_inicio').value,
+        orcamento_total: document.getElementById('orcamento_total').value,
+        prazo_entrega: document.getElementById('prazo_entrega').value 
+      };
+
+      fetch('http://localhost:5000/obras', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.msg || data.erro);
+        window.location.href = "painel-cards-admin-obras.html"; 
+      })
+      .catch(error => console.error('Erro ao cadastrar obra:', error));
+    });
+
+    
+  </script>
+</body>
+</html>

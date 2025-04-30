@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Painel de Obras – Admin</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <header class="logo-Centro">
+    <a href="../homepage.html" class="logo-Centro">
+      <h1><i class="fas fa-home"></i> <span>BR</span>Construtora</h1>
+    </a>
+  </header>
+
+  <main class="container">
+
+    <h1>Lista de Obras</h1>
+  
+    <div class="botoes">
+      <button onclick="window.location.href='cadastro-obra.html'">+ Nova Obra</button>
+    </div>
+  
+    <div class="cards-container" id="cardsContainer">
+      
+    </div>
+  </main>
+  
+
+  <footer>
+    &copy; 2025 BR Construtora. Todos os direitos reservados.
+  </footer>
+
+  <script>
+    function excluirObra(id) {
+  if (confirm('Tem certeza que deseja excluir esta obra?')) {
+    fetch(`http://127.0.0.1:5000/obras/${id}`, {
+      method: 'DELETE'
+    })
+    .then(res => res.json())
+    .then(data => {
+      alert(data.msg || data.erro);
+      location.reload(); // Atualiza a lista de obras depois de excluir
+    })
+    .catch(err => {
+      console.error('Erro ao excluir a obra:', err);
+      alert('Erro ao excluir obra.');
+    });
+  }
+}
+fetch('http://127.0.0.1:5000/obras')
+  .then(res => res.json())
+  .then(obras => {
+    const container = document.getElementById('cardsContainer');
+    container.innerHTML = ''; // limpar antes
+
+    obras.forEach(obra => {
+      const card = document.createElement('div');
+      card.className = 'obra-card'; // classe de estilização
+
+      card.innerHTML = `
+        <h3>${obra.titulo}</h3>
+        <p><strong>Cliente:</strong> ${obra.cliente_nome}</p>
+        <p><strong>Status:</strong> ${obra.status}</p>
+        <p><strong>Início:</strong> ${new Date(obra.data_inicio).toLocaleDateString('pt-BR')}</p>
+        <div class="botoes-card">
+          <button onclick="window.location.href='admin-obra.html?id=${obra.id}'">Acessar</button>
+          <button onclick="excluirObra(${obra.id})">Excluir</button>
+        </div>
+      `;
+
+      container.appendChild(card);
+    });
+  })
+  .catch(err => {
+    document.body.innerHTML += `<p style="color:red;">Erro ao carregar obras: ${err}</p>`;
+  });
+
+     
+  </script>
+</body>
+</html>
