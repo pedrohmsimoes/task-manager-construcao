@@ -1,7 +1,7 @@
 # 📱 Painel de Obras - Frontend Simplificado
 
-Frontend básico para acompanhamento de obras, desenvolvido com tecnologias essenciais.
-Projeto esta em andamento para desenvolvimento do back-end
+**Frontend básico para acompanhamento de obras, desenvolvido com tecnologias essenciais.**
+**Projeto esta em andamento para desenvolvimento do back-end em Python.**
 
 ## 🔧 O que foi feito
 
@@ -23,8 +23,8 @@ Projeto esta em andamento para desenvolvimento do back-end
 | Página          | Funcionalidades                          |
 |-----------------|------------------------------------------|
 | `index.html`    | Página inicial com links                 |
-| `acompanhe.html`    | Formulário de login básico           |
-| `painel.html` | Visualização de obras (cards simples)      |
+| `acompanhe.html`| Formulário de login básico               |
+| `painel.html`   | Visualização de obras (cards simples)    |
 
 ## 🚀 Como Rodar
 1. Baixe os arquivos
